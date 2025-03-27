@@ -9,7 +9,7 @@ import numpy as np
 
 from sim.interp import *
 from sim.advect2d import *
-from sim.flui2d import *
+from sim.fluid2d import *
 
 
 def chess_pattern(res, block_size):
@@ -103,41 +103,25 @@ class Fluid2DSolver:
         Exporter.log("[FLUID] done")
 
     def substep(self, dt):
-        advect_u_sl_2d(
-            self._u_x,
-            self._u_y,
-            self._u_x_tmp,
-            self._u_y_tmp,
-            self._dx,
-            dt,
-        )
-        advect_q_sl_2d(
+        advect_q_mc_2d(
             self._u_x,
             self._u_y,
             self._color,
             self._color_tmp,
+            self._color_tmp2,
             self._dx,
             dt,
         )
-        # advect_u_mc_2d(
-        #     self._u_x,
-        #     self._u_y,
-        #     self._u_x_tmp,
-        #     self._u_y_tmp,
-        #     self._u_x_tmp2,
-        #     self._u_y_tmp2,
-        #     self._dx,
-        #     dt,
-        # )
-        # advect_q_mc_2d(
-        #     self._u_x,
-        #     self._u_y,
-        #     self._color,
-        #     self._color_tmp,
-        #     self._color_tmp2,
-        #     self._dx,
-        #     dt,
-        # )
+        advect_u_mc_2d(
+            self._u_x,
+            self._u_y,
+            self._u_x_tmp,
+            self._u_y_tmp,
+            self._u_x_tmp2,
+            self._u_y_tmp2,
+            self._dx,
+            dt,
+        )
 
 
 if __name__ == "__main__":
