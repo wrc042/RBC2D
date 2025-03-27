@@ -12,3 +12,8 @@ pip install taichi -U
 pip install matplotlib
 ```
 
+## Execution
+
+```bash
+python python ./exec/fluid2d.py
+```
