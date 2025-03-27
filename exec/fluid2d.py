@@ -11,6 +11,8 @@ from sim.interp import *
 from sim.advect2d import *
 from sim.fluid2d import *
 
+from sim.projector2d import VelProject2D
+
 
 def chess_pattern(res, block_size):
     pattern = np.zeros(res, dtype=np.float32)
@@ -34,7 +36,7 @@ class Fluid2DSolver:
             self._cfl = 1.0
 
             self._vdt = 0.01
-            self._total_frame = 20
+            self._total_frame = 50
 
         self._u_x = ti.field(float, [res[0] + 1, res[1]])
         self._u_y = ti.field(float, [res[0], res[1] + 1])
@@ -42,6 +44,8 @@ class Fluid2DSolver:
         self._u_y_tmp = ti.field(float, [res[0], res[1] + 1])
         self._u_x_tmp2 = ti.field(float, [res[0] + 1, res[1]])
         self._u_y_tmp2 = ti.field(float, [res[0], res[1] + 1])
+
+        self.projector = VelProject2D(res, self._dx, self._u_x, self._u_y)
 
         self._u_max = ti.field(float, shape=())
         self._u = ti.Vector.field(2, float, res)
@@ -62,6 +66,7 @@ class Fluid2DSolver:
             u_x_np = np.exp(-((x_grid - 0.5) ** 2 + (y_grid - 0.5) ** 2) / 0.05)
             self._u_x.from_numpy(u_x_np)
             self._u_y.fill(0.0)
+            self.projector.solve()
 
         self.export_data(0)
 
@@ -71,16 +76,13 @@ class Fluid2DSolver:
             Exporter.export_field_image(
                 color, "color", frame, relative=False, vmin=0.0, vmax=1.0, cmap="gray"
             )
-        u_x = self._u_x.to_numpy()
-        Exporter.export_field_image(u_x, "u_x", frame)
-        u_y = self._u_y.to_numpy()
-        Exporter.export_field_image(u_y, "u_y", frame)
         cal_u_mag_kernel(self._u_x, self._u_y, self._u_mag)
         u_mag = self._u_mag.to_numpy()
-        Exporter.export_field_image(u_mag, "u_mag", frame)
+        Exporter.export_field_image(u_mag, "u", frame)
+        Exporter.tag_frame(frame)
 
     def run(self):
-        for i in range(1, self._total_frame):
+        for i in range(1, self._total_frame + 1):
             target_t = self._vdt * i
             while self._t < target_t:
                 max_velocity_2d_kernel(
@@ -122,6 +124,7 @@ class Fluid2DSolver:
             self._dx,
             dt,
         )
+        self.projector.solve()
 
 
 if __name__ == "__main__":
