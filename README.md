@@ -15,5 +15,11 @@ pip install matplotlib
 ## Execution
 
 ```bash
-python python ./exec/fluid2d.py
+python python ./exec/rbc2d.py
+```
+
+Generate the video:
+
+```powershell
+./scripts/gen_video.ps1 ./exps/rbc T
 ```
