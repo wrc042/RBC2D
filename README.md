@@ -15,7 +15,7 @@ pip install matplotlib
 ## Execution
 
 ```bash
-python python ./exec/rbc2d.py
+python ./exec/rbc2d.py
 ```
 
 Generate the video:
