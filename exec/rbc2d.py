@@ -49,7 +49,7 @@ class Fluid2DSolver:
 
         if case == 0:
             self._vdt = 0.2
-            self._total_frame = 500
+            self._total_frame = 400
 
             self._kappa = 2e-5
             self._alpha = 4e-5
