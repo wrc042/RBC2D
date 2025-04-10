@@ -19,12 +19,14 @@ from sim.heat2d import *
 
 
 class Fluid2DSolver:
-    def __init__(self, case=0):
+    def __init__(self, args):
+        case = args.c
         if case == 0:
-            self._N = 64
-            self._res = [self._N * 2, self._N]
+            self._N = args.n
+            self._res = [self._N * 3, self._N]
             res = self._res
-            self._dx = 0.1 / self._N
+            self._L = 0.05
+            self._dx = self._L / self._N
             self._g = 9.81
             self._cfl = 1.0
 
@@ -49,12 +51,12 @@ class Fluid2DSolver:
 
         if case == 0:
             self._vdt = 0.2
-            self._total_frame = 400
+            self._total_frame = args.f
 
-            self._kappa = 2e-5
-            self._alpha = 4e-5
-            T0 = 323
-            T1 = 273
+            self._kappa = args.k
+            self._alpha = args.a
+            T0 = args.T0
+            T1 = args.T1
             self._T0 = T0
             self._T1 = T1
             T = np.linspace(T0, T1, res[1], endpoint=True).reshape(1, -1)
@@ -66,15 +68,20 @@ class Fluid2DSolver:
             ] = T0
             self._T.from_numpy(T)
 
-            self._nu = 1e-5
+            self._nu = args.nu
             self._u_x.fill(0.0)
             self._u_y.fill(0.0)
+
+        Ra = (self._g * self._alpha * (self._T0 - self._T1) * self._L**3) / (
+            self._nu * self._kappa
+        )
+        Exporter.log(f"[RBC] Ra = {Ra:.3e}")
 
         self.export_data(0)
 
     def export_data(self, frame):
         T = self._T.to_numpy()
-        Exporter.export_field_image(T, "T", frame)
+        Exporter.export_field_image(T, "T", frame, dpi=200)
 
         Exporter.tag_frame(frame)
 
@@ -162,9 +169,17 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("-c", type=int, default=0, help="case")
+    parser.add_argument("-n", type=int, default=128, help="resolution")
+    parser.add_argument("-f", type=int, default=400, help="total frame")
+    parser.add_argument("-k", type=float, default=5e-6, help="kappa")
+    parser.add_argument("-a", type=float, default=2e-5, help="alpha")
+    parser.add_argument("--nu", type=float, default=5e-6, help="nu")
+    parser.add_argument("--T0", type=float, default=298, help="T0")
+    parser.add_argument("--T1", type=float, default=273, help="T1")
     args = parser.parse_args()
 
-    Exporter.init("exps", "rbc")
+    Exporter.init("exps", f"rbc-c{args.c}")
 
-    solver = Fluid2DSolver()
+    solver = Fluid2DSolver(args)
     solver.run()

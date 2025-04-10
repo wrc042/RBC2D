@@ -18,8 +18,8 @@ pip install matplotlib
 python ./exec/rbc2d.py
 ```
 
-Generate the video:
+Generate the video (require ffmpeg):
 
 ```powershell
-./scripts/gen_video.ps1 ./exps/rbc T
+./scripts/gen_video.ps1 ./exps/rbc-c0 T
 ```
