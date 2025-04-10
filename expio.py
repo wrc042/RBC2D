@@ -170,7 +170,7 @@ class Exporter:
         else:
             p = ax.imshow(array, cmap=cmap, vmin=vmin, vmax=vmax)
 
-        fig.colorbar(p)
+        # fig.colorbar(p)
         if frame is not None:
             plt.title(f"frame {frame:04d}")
         fig.savefig(path, dpi=dpi)
