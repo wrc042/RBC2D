@@ -14,6 +14,8 @@ pip install matplotlib
 
 ## Execution
 
+See `./scripts/run.ps1`
+
 ```bash
 python ./exec/rbc2d.py
 ```
